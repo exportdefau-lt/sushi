@@ -438,7 +438,7 @@ Everything sushi writes goes inside a marked block:
   chosen key, and the picker does the same for as long as it is open so `ctrl-s` reaches fzf instead
   of freezing the screen. Both put your original tty settings back; pass `--key='^G'` if you'd
   rather `key` mode didn't touch them at all.
-- Generated aliases are a best guess (first DNS label, or `srv-10-0-0-5` for an IP). Rename them —
+- Generated aliases are a best guess (first DNS label; for an IP, the ssh user — or `srv-10-0-0-5` if there is none). Rename them —
   edits inside the managed block survive.
 - On Linux, `gnome-sushi` also installs a `/usr/bin/sushi` (a file previewer). If you have it, one
   of the two wins on `$PATH`. macOS has no such clash.
