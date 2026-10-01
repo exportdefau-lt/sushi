@@ -476,11 +476,13 @@ build_additions() {
     printf '%s\n' '@@SUSHI_SELECTED@@'
     cat
   } | AWK -v sep="$SEP" -v forced="$forced" -v added="$added" '
-      # ${host%%.*} for a name, srv-1-2-3-4 for a bare IP, then the same
-      # lowercase-and-replace-the-rest that `tr A-Z a-z | tr -c a-z0-9._- -` did.
-      function sanitize(h,   b) {
+      # ${host%%.*} for a name; for a bare IP the ssh user, or srv-1-2-3-4 when
+      # there is none. Then the same lowercase-and-replace-the-rest that
+      # `tr A-Z a-z | tr -c a-z0-9._- -` did.
+      function sanitize(h, u,   b) {
         if (h ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/) {
-          b = h; gsub(/\./, "-", b); b = "srv-" b
+          if (u != "") b = u
+          else { b = h; gsub(/\./, "-", b); b = "srv-" b }
         } else {
           b = h; sub(/\..*/, "", b)
         }
@@ -498,9 +500,9 @@ build_additions() {
         if (forced != "") {
           name = forced
         } else {
-          base = sanitize(host)
+          base = sanitize(host, user)
           name = base
-          if (name in taken) name = base (user != "" ? "-" user : "")
+          if (name in taken && base != tolower(user)) name = base (user != "" ? "-" user : "")
           i = 2
           while (name in taken) { name = base "-" i; i++ }
         }

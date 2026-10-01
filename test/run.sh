@@ -552,7 +552,7 @@ cat > "$H/.zsh_history" <<'EOF'
 : 4:0;ssh three@dup.example.org
 EOF
 out="$(run "$H" scan -n)"
-assert_has "IP addresses get a readable alias" "Host srv-10-0-0-1" "$out"
+assert_has "an IP with a user is named after the user" "Host a" "$out"
 assert_has "first of a name collision"         "Host dup"          "$out"
 n="$(printf '%s\n' "$out" | grep -c '^Host dup')"
 assert_eq "colliding names all get distinct aliases" "3" "$n"
@@ -1146,7 +1146,7 @@ EOF
   assert_has "the key"                 "IdentityFile /tmp/k" "$out"
   assert_has "and the jump host"       "ProxyJump bastion"   "$out"
   out="$(oldawk "$H" add -n 10.0.0.7)"
-  assert_has "and an IP still gets the srv- alias" "Host srv-10-0-0-7" "$out"
+  assert_has "and an IP with no user still gets the srv- alias" "Host srv-10-0-0-7" "$out"
 
   # the port check is ^[0-9]{1,5}$ written without an interval expression
   out="$(printf 'ssh -p 999999 sixdigits.example.com
@@ -1604,9 +1604,11 @@ assert_has "and it is what gets used"  "staging"      "$(run "$H" list)"
 out="$(run "$H" add --as=inline other.example.com)"
 assert_has "--as=NAME works too" "Host inline" "$out"
 
-# an IP with no --as still gets the readable alias scan would have given it
+# an IP with no --as is named after the ssh user; with no user it gets srv-<ip>
+out="$(run "$H" add -n carol@192.168.1.253)"
+assert_has "an IP is named after its ssh user" "Host carol" "$out"
 out="$(run "$H" add -n 192.168.1.254)"
-assert_has "an IP gets the srv- alias" "Host srv-192-168-1-254" "$out"
+assert_has "an IP with no user gets the srv- alias" "Host srv-192-168-1-254" "$out"
 
 # refusing the obvious mistakes
 out="$(run "$H" add deploy@web1.example.com)"
